@@ -133,16 +133,16 @@ export default class collectingStarScene extends Phaser.Scene {
 
     update() {
 
-        const moveLeft = this.cursor.left.isDown;
-        const moveRight = this.cursor.right.isDown;
-        const jump = this.cursor.up.isDown;
-        const down = this.cursor.down.isDown;
+        let moveLeft = this.cursor.left.isDown;
+        let moveRight = this.cursor.right.isDown;
+        let jump = this.cursor.up.isDown;
+        let down = this.cursor.down.isDown;
 
         if (moveLeft) {
             this.player.setVelocity(-200, 200);
             this.player.anims.play('left', true);
             if(!moveLeft){
-                this.player.anims.pause('left', true)
+                this.player.anims.pause()
             }
         }
         else if(moveRight){
@@ -157,5 +157,14 @@ export default class collectingStarScene extends Phaser.Scene {
             this.player.setVelocityY(200);
             this.player.anims.play('turn', true);
         }
+
+        document.addEventListener('keyup', (e)=>{
+            console.log('key:', e.key)
+            if(e.key ==='ArrowLeft'){
+                moveLeft = false;
+            }
+        })
     }
+
+
 }
