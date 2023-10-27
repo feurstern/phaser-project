@@ -165,7 +165,7 @@ export default class collectingStarScene extends Phaser.Scene {
 
         let moveLeft = this.cursor.left.isDown;
         let moveRight = this.cursor.right.isDown;
-        let jump = this.cursor.up.isDown;
+        let jump = this.cursor.space.isDown;
         let down = this.cursor.down.isDown;
 
         if (moveLeft) {

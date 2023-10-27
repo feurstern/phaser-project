@@ -14,7 +14,7 @@ const config ={
             debug:true
         }
     },
-    scene : [scene1]
+    scene : [copyscene]
 }
 
 export default new Phaser.Game(config);
