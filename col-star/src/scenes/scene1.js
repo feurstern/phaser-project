@@ -13,7 +13,12 @@ export default class collectingStarScene extends Phaser.Scene {
         this.player = undefined;
 
         this.stars = undefined;
+        // we create this.properties for storing the key
+
         this.cursor = undefined;
+
+        this.titleGame = undefined;
+        this.score = 0;
     }
 
     // load the asset from public folder
@@ -106,94 +111,69 @@ export default class collectingStarScene extends Phaser.Scene {
             child.setBounceY(0.7);
         })
 
+        //define to detect the key when it's being pressed
         this.cursor = this.input.keyboard.createCursorKeys();
 
-        const playerFrame = [
-            {
-                key:'left',
-                spriteName:'player',
-                startFrame : 0,
-                endFrame: 3,
-                frameRate:20,
-                repeat: -1,
-                isStatic : false
-            },
-             {
-                key:'turn',
-                spriteName:'player',
-                startFrame : 4,
-                endFrame: null,
-                frameRate:20,
-                repeat: null,
-                isStatic :true
-            },
-             {
-                key:'right',
-                spriteName:'player',
-                startFrame : 5,
-                endFrame: 8,
-                frameRate:20,
-                repeat: -1,
-                isStatic : false
-            },
-        ]
-
-
-        playerFrame.forEach((data)=>{
-            if(data.isStatic){
-                this.anims.create({
-                    key: data.key,
-                    frames : [{key: data.spriteName, frame: data.startFrame}],
-                    frameRate : data.frameRate
-                })
-            }
-            else{
-                this.anims.create({
-                    key:data.key,
-                    frames: this.anims.generateFrameNumbers(data.spriteName, {start:data.startFrame, end: data.endFrame}),
-                    frameRate : data.frameRate,
-                    repeat: data.repeat
-                })
-            }
+        // for move left animation(dynamic)
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
         })
 
-    
+        // move right animation(dynamic)
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        })
+
+        // idle animation(static)
+        this.anims.create({
+            key: 'turn',
+            frames: [{ key: 'player', frame: 4 }],
+            frameRate: 15
+        })
+
+        // overlap for between the player object and star object
+        this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
+
+
+        // creating a text to show
+
+        this.titleGame = this.add.text(15, 15, 'My game', { fontSize: '40px' })
     }
 
-
     update() {
-
-        let moveLeft = this.cursor.left.isDown;
-        let moveRight = this.cursor.right.isDown;
-        let jump = this.cursor.space.isDown;
-        let down = this.cursor.down.isDown;
+        const moveLeft = this.cursor.left.isDown;
+        const moveRight = this.cursor.right.isDown;
+        const jump = this.cursor.space.isDown;
 
         if (moveLeft) {
-            this.player.setVelocity(-200, 200);
-            this.player.anims.play('left', true);
-            if(!moveLeft){
-                this.player.anims.pause()
-            }
+            // alert('The left arrow key is pressed!')
+            this.player.setVelocityX(-200)
+            this.player.anims.play('left', true)
         }
-        else if(moveRight){
-            this.player.setVelocityX(200,200);
+        else if (moveRight) {
+            // alert('The right arrow is pressed!')
+            this.player.setVelocityX(200)
             this.player.anims.play('right', true)
         }
-        else if(jump){
+        else if (jump) {
+            // alert('The space key is pressed!')
             this.player.setVelocityY(-200)
-            this.player.anims.play('turn', true)
+            this.player.anims.play('turn')
         }
-        else if(down){
-            this.player.setVelocityY(200);
-            this.player.anims.play('turn', true);
-        }
+    }
 
-        document.addEventListener('keyup', (e)=>{
-            console.log('key:', e.key)
-            if(e.key ==='ArrowLeft'){
-                moveLeft = false;
-            }
-        })
+    collectStar(player, star) {
+        star.destroy()
+        this.score+=10;
+        console.log('The current score:', this.score)
+    }
+    gameOver(player,bomb){
     }
 
 
