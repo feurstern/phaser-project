@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import Phaser from "phas//er";
 
 
 const baseScale = 0.5;
