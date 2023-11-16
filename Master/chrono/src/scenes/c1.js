@@ -43,6 +43,7 @@ const assetImage = [
         path: 'sd/laserbolt',
         isBackground: false,
         isStatic: false,
+        isProjectile: true,
     },
     {
         key: 'left-btn',
@@ -67,6 +68,7 @@ const assetImage = [
         path: 'sd/ship.png',
         isBackground: false,
         isStatic: false,
+        isProjectile: false,
     },
     {
         key: 'shoot-btn',
@@ -75,6 +77,30 @@ const assetImage = [
         isStatic: true,
     },
 
+]
+
+const playerAnimation = [
+    {
+        key: 'left',
+        startFrame: 1,
+        endFrame: 2,
+        spriteName: 'player',
+        isStatic: false
+    },
+    {
+        key: 'right',
+        startFrame: 1,
+        endFrame: 2,
+        spriteName: 'player',
+        isStatic: false
+    },
+    {
+        key: 'tur',
+        startFrame: '0',
+        endFrame: null,
+        spriteName: 'player',
+        isStatic: true
+    }
 ]
 
 
@@ -160,11 +186,13 @@ export default class Testing1 extends Phaser.Scene {
         })
 
         this.righBtn.on('pointerdown', () => {
-            this.righBtn = true;
+            this.rightBtn = true;
+            console.log('press RIGHT')
         })
 
         this.righBtn.on('pointerup', () => {
-            this.righBtn = false;
+            this.rightBtn = false;
+            console.log('unpressed right')
         })
 
         this.shootBtn.on('pointerdown', () => {
@@ -178,13 +206,44 @@ export default class Testing1 extends Phaser.Scene {
     }
 
 
-    createPlayer(){
-        this.player = this.add.sprite(300, 550, 'player');
+    createPlayer() {
+        this.player = this.physics.add.sprite(200, 450, 'player');
+        this.player.setCollideWorldBounds(true);
+        playerAnimation.forEach(dt=>{
+            // start  isStatic
+            if(dt.isStatic){
+                this.anims.create({
+                    key: dt.key,
+                    frames:[{
+                        key:dt.spriteName, frame: dt.startFrame
+                    }]
+                })
+            }
+            // end of static
+            else if(!dt.isStatic){
+                console.log(dt)
+                this.anims.create({
+                    key : dt.key,
+                    frames: this.anims.generateFrameNumbers(dt.spriteName, { start: dt.startFrame, end: dt.endFrame})
+                })
+            }
+        })
+
+    }
+    
+    playerMovement(player, time){
+        if(this.leftBtn){
+            this.player.setVelocityX(-100)
+        }
+        else if(this.righBtn){
+            this.player.setVelocityX(100)
+        }
     }
 
 
 
     update() {
         this.moveCloud()
+        this.playerMovement(this.player, this.time)
     }
 }
