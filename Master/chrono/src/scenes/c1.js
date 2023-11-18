@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-
+import FallingObject from "./FallingObject";
 
 const assetImage = [
     {
@@ -114,8 +114,10 @@ export default class Testing1 extends Phaser.Scene {
         this.leftBtn = '';
         this.righBtn = '';
         this.shootBtn = '';
-
         this.player = 'f';
+
+        this.enemy ='2';
+        this.enemySpeed = 20;
 
     }
 
@@ -124,9 +126,12 @@ export default class Testing1 extends Phaser.Scene {
         assetImage.forEach((data) => {
             if (data.isStatic) {
                 this.load.image(data.key, data.path);
+                if(data.key==='enemy'){
+                    console.log(data)
+                }
             }
             else if (!data.isStatic) {
-                console.log('load data:', data)
+                // console.log('load data:', data)
                 this.load.spritesheet(data.key, data.path, {
                     frameWidth: 66,
                     frameHeight: 66
@@ -147,6 +152,9 @@ export default class Testing1 extends Phaser.Scene {
         this.createCloud();
         this.createButton();
         this.createPlayer();
+        this.createEnemy();
+        this.createTime();
+        
 
     }
 
@@ -230,14 +238,48 @@ export default class Testing1 extends Phaser.Scene {
         })
 
     }
-    
+
     playerMovement(player, time){
         if(this.leftBtn){
-            this.player.setVelocityX(-100)
+            this.player.setVelocityX(-200);
+            this.player.anims.play('left', true);
+            this.player.setFlipX(false)
         }
         else if(this.righBtn){
-            this.player.setVelocityX(100)
+            this.player.setVelocityX(200);
+            this.player.anims.play('right', true);
+            this.player.setFlipX(true)
         }
+    }
+
+    createEnemy(){
+
+        this.enemy = this.load.image(300, 200, 'enemy');
+        this.enemy = this.physics.add.group({
+            classType: FallingObject,
+            maxSize: 12,
+            runChildUpdate: true
+        });
+    }
+
+    createTime(){
+        this.time.addEvent({
+            delay : Phaser.Math.Between(1000, 5000),
+            callBack : this.spawnEnemy(),
+            callbackScope: true,
+            loop : true
+        })
+    }
+
+    spawnEnemy(){
+        const config={
+            speed: 30,
+            rotation : 0.55
+        };
+
+        const enemy = this.enemy.get(0,0, 'enemy', config);
+        const positionX = Phaser.Math.Between(50, 350);
+        enemy ? enemy.spawn(positionX) : 0;
     }
 
 
@@ -245,5 +287,6 @@ export default class Testing1 extends Phaser.Scene {
     update() {
         this.moveCloud()
         this.playerMovement(this.player, this.time)
+        this.spawnEnemy();
     }
 }
