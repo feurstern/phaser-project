@@ -160,7 +160,7 @@ export default class MainPlaneScene extends Phaser.Scene {
     moveCloud() {
         this.cloud.children.iterate(e => {
             e.setVelocityY(25)
-            // console.log(e.y);
+            // console.log(e.y);----
             e.y > this.scale.height ? (
                 e.x = Phaser.Math.Between(10, 400),
                 e.y = 0

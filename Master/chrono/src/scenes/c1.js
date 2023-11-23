@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import FallingObject from "./FallingObject";
+import Laser from "./L1";
 
 const assetImage = [
     {
@@ -112,12 +113,16 @@ export default class Testing1 extends Phaser.Scene {
     init() {
         this.cloud = undefined;
         this.leftBtn = '';
-        this.righBtn = '';
+        this.rightBtn = '';
         this.shootBtn = '';
         this.player = 'f';
 
         this.enemy ='2';
         this.enemySpeed = 20;
+
+        this.laser = '';
+        this.laserFired = 10;
+
 
     }
 
@@ -130,11 +135,19 @@ export default class Testing1 extends Phaser.Scene {
                     console.log(data)
                 }
             }
-            else if (!data.isStatic) {
-                // console.log('load data:', data)
+            else if (!data.isStatic && !data.isProjectile) {
+                console.log('load data:', data)
                 this.load.spritesheet(data.key, data.path, {
                     frameWidth: 66,
                     frameHeight: 66
+                })
+            }
+
+            else if(!data.isStatic &&  data.isProjectile){
+                // console.log('data 3:', data);
+                this.load.spritesheet(data.key, data.path, {
+                    frameWidth : 16,
+                    frameHeight : 16
                 })
             }
         })
@@ -154,6 +167,7 @@ export default class Testing1 extends Phaser.Scene {
         this.createPlayer();
         this.createEnemy();
         this.createTime();
+        this.createLaser();
         
 
     }
@@ -180,35 +194,37 @@ export default class Testing1 extends Phaser.Scene {
     }
 
     createButton() {
-        this.leftBtn = this.add.image(50, 550, 'left-btn').setInteractive().setDepth(0.5).setAlpha(0.8);
-        this.righBtn = this.add.image(this.leftBtn.x + this.leftBtn.displayWidth, 550, 'right-btn').setInteractive().setDepth(0.5).setAlpha(0.8);
-        this.shootBtn = this.add.image(340, 550, 'shoot-btn').setInteractive().setDepth(0.5).setAlpha(0.5)
 
-        this.leftBtn.on('pointerdown', () => {
+        let leftBtn = this.add.image(50, 550, 'left-btn').setInteractive().setDepth(0.5).setAlpha(0.8);
+        let rightBtn = this.add.image(leftBtn.x + leftBtn.displayWidth, 550, 'right-btn').setInteractive().setDepth(0.5).setAlpha(0.8);
+        let shootBtn = this.add.image(340, 550, 'shoot-btn').setInteractive().setDepth(0.5).setAlpha(0.5)
+
+        // console.log(rgih)
+        leftBtn.on('pointerdown', () => {
             this.leftBtn = true;
             console.log('press left')
         })
 
-        this.leftBtn.on('pointerup', () => {
+        leftBtn.on('pointerup', () => {
             this.leftBtn = false;
         })
 
-        this.righBtn.on('pointerdown', () => {
+        rightBtn.on('pointerdown', () => {
             this.rightBtn = true;
             console.log('press RIGHT')
         })
 
-        this.righBtn.on('pointerup', () => {
+        rightBtn.on('pointerup', () => {
             this.rightBtn = false;
             console.log('unpressed right')
         })
 
-        this.shootBtn.on('pointerdown', () => {
+        shootBtn.on('pointerdown', () => {
             this.shootBtn = true;
             console.log('press up')
         })
 
-        this.shootBtn.on('pointerup', () => {
+        shootBtn.on('pointerup', () => {
             this.shootBtn = false;
         })
     }
@@ -239,16 +255,27 @@ export default class Testing1 extends Phaser.Scene {
 
     }
 
-    playerMovement(player, time){
+    playerMovement(){
         if(this.leftBtn){
             this.player.setVelocityX(-200);
             this.player.anims.play('left', true);
             this.player.setFlipX(false)
         }
-        else if(this.righBtn){
+        else if(this.rightBtn){
             this.player.setVelocityX(200);
             this.player.anims.play('right', true);
             this.player.setFlipX(true)
+        }
+        // console.log('time :', this.time)
+        if((this.shootBtn) &&  this.laserFired){
+            const laser = this.laser.get(0,0, 'laserbolt');
+            console.log('shioot')
+            laser ? (
+                laser.fire(this.player.x, this.player.y),
+                this.laserFired =  150
+            )
+            :0
+
         }
     }
 
@@ -282,11 +309,18 @@ export default class Testing1 extends Phaser.Scene {
         enemy ? enemy.spawn(positionX) : 0;
     }
 
+    createLaser(){
+        this.laser = this.physics.add.group({
+            classType : Laser,
+            maxSize : 10,
+            runChildUpdate : true
+        })
+    }
 
 
     update() {
         this.moveCloud()
-        this.playerMovement(this.player, this.time)
+        this.playerMovement()
         this.spawnEnemy();
     }
 }
