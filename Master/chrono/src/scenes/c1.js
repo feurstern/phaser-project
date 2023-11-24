@@ -41,7 +41,7 @@ const assetImage = [
     },
     {
         key: 'laserbolt',
-        path: 'sd/laserbolt',
+        path: 'sd/laser-bolts.png',
         isBackground: false,
         isStatic: false,
         isProjectile: true,
@@ -122,6 +122,7 @@ export default class Testing1 extends Phaser.Scene {
 
         this.laser = '';
         this.laserFired = 10;
+        // this.time = time;
 
 
     }
@@ -136,7 +137,7 @@ export default class Testing1 extends Phaser.Scene {
                 }
             }
             else if (!data.isStatic && !data.isProjectile) {
-                console.log('load data:', data)
+                // console.log('load data:', data)
                 this.load.spritesheet(data.key, data.path, {
                     frameWidth: 66,
                     frameHeight: 66
@@ -144,7 +145,7 @@ export default class Testing1 extends Phaser.Scene {
             }
 
             else if(!data.isStatic &&  data.isProjectile){
-                // console.log('data 3:', data);
+                console.log('data 3:', data);
                 this.load.spritesheet(data.key, data.path, {
                     frameWidth : 16,
                     frameHeight : 16
@@ -168,6 +169,8 @@ export default class Testing1 extends Phaser.Scene {
         this.createEnemy();
         this.createTime();
         this.createLaser();
+        // this.hitEnemy(Laser, FallingObject);
+        this.physics.add.overlap(this.laser, this.enemy, this.hitEnemy, null, this)
         
 
     }
@@ -267,12 +270,12 @@ export default class Testing1 extends Phaser.Scene {
             this.player.setFlipX(true)
         }
         // console.log('time :', this.time)
-        if((this.shootBtn) &&  this.laserFired){
+        if((this.shootBtn) && this.laserFired){
             const laser = this.laser.get(0,0, 'laserbolt');
             console.log('shioot')
             laser ? (
                 laser.fire(this.player.x, this.player.y),
-                this.laserFired =  150
+                this.laserFired =  200
             )
             :0
 
@@ -305,6 +308,7 @@ export default class Testing1 extends Phaser.Scene {
         };
 
         const enemy = this.enemy.get(0,0, 'enemy', config);
+        console.log('enemy:', enemy);
         const positionX = Phaser.Math.Between(50, 350);
         enemy ? enemy.spawn(positionX) : 0;
     }
@@ -317,10 +321,17 @@ export default class Testing1 extends Phaser.Scene {
         })
     }
 
+    hitEnemy(laser, enemy){
+        laser.destroy();
+        enemy.destroy();
+    }
 
     update() {
         this.moveCloud()
         this.playerMovement()
         this.spawnEnemy();
+        
+
+        // console.log('time', this.time)
     }
 }

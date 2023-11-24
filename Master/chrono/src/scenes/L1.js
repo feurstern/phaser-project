@@ -18,6 +18,12 @@ export default class Laser extends Phaser.Physics.Arcade.Sprite {
 
     }
 
+
+    hitEnemy(laser, enemy){
+        laser.die();
+        enemy.die();
+    }
+
     update(time) {
         this.setVelocityY(-200);
         this.y < -1 ? this.die() : 0;
