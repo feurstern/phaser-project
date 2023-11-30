@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import FallingObject from "./FallingObject";
 import Laser from "./L1";
-
+import GameOver from "./go";
 const assetImage = [
     {
         key: 'bg',
@@ -117,13 +117,19 @@ export default class Testing1 extends Phaser.Scene {
         this.shootBtn = '';
         this.player = 'f';
 
-        this.enemy ='2';
+        this.enemy = '2';
         this.enemySpeed = 20;
 
         this.laser = '';
         this.laserFired = 10;
         // this.time = time;
 
+        this.scoreText = 'ds';
+        this.score = 0;
+
+
+        this.playerLifeStatus = '';
+        this.playerLife = 3
 
     }
 
@@ -132,7 +138,7 @@ export default class Testing1 extends Phaser.Scene {
         assetImage.forEach((data) => {
             if (data.isStatic) {
                 this.load.image(data.key, data.path);
-                if(data.key==='enemy'){
+                if (data.key === 'enemy') {
                     console.log(data)
                 }
             }
@@ -144,11 +150,11 @@ export default class Testing1 extends Phaser.Scene {
                 })
             }
 
-            else if(!data.isStatic &&  data.isProjectile){
+            else if (!data.isStatic && data.isProjectile) {
                 console.log('data 3:', data);
                 this.load.spritesheet(data.key, data.path, {
-                    frameWidth : 16,
-                    frameHeight : 16
+                    frameWidth: 16,
+                    frameHeight: 16
                 })
             }
         })
@@ -170,9 +176,12 @@ export default class Testing1 extends Phaser.Scene {
         this.createTime();
         this.createLaser();
         // this.hitEnemy(Laser, FallingObject);
-        this.physics.add.overlap(this.laser, this.enemy, this.hitEnemy, null, this)
-        
 
+        //whenever you want to implement collision
+        this.physics.add.overlap(this.laser, this.enemy, this.hitEnemy, null, this)
+        this.createScoreText();
+
+        this.physics.add.overlap(this.player, this.enemy, this.playerCollision, null, this)
     }
 
 
@@ -236,53 +245,53 @@ export default class Testing1 extends Phaser.Scene {
     createPlayer() {
         this.player = this.physics.add.sprite(200, 450, 'player');
         this.player.setCollideWorldBounds(true);
-        playerAnimation.forEach(dt=>{
+        playerAnimation.forEach(dt => {
             // start  isStatic
-            if(dt.isStatic){
+            if (dt.isStatic) {
                 this.anims.create({
                     key: dt.key,
-                    frames:[{
-                        key:dt.spriteName, frame: dt.startFrame
+                    frames: [{
+                        key: dt.spriteName, frame: dt.startFrame
                     }]
                 })
             }
             // end of static
-            else if(!dt.isStatic){
+            else if (!dt.isStatic) {
                 console.log(dt)
                 this.anims.create({
-                    key : dt.key,
-                    frames: this.anims.generateFrameNumbers(dt.spriteName, { start: dt.startFrame, end: dt.endFrame})
+                    key: dt.key,
+                    frames: this.anims.generateFrameNumbers(dt.spriteName, { start: dt.startFrame, end: dt.endFrame })
                 })
             }
         })
 
     }
 
-    playerMovement(){
-        if(this.leftBtn){
+    playerMovement() {
+        if (this.leftBtn) {
             this.player.setVelocityX(-200);
             this.player.anims.play('left', true);
             this.player.setFlipX(false)
         }
-        else if(this.rightBtn){
+        else if (this.rightBtn) {
             this.player.setVelocityX(200);
             this.player.anims.play('right', true);
             this.player.setFlipX(true)
         }
         // console.log('time :', this.time)
-        if((this.shootBtn) && this.laserFired){
-            const laser = this.laser.get(0,0, 'laserbolt');
+        if ((this.shootBtn) && this.laserFired) {
+            const laser = this.laser.get(0, 0, 'laserbolt');
             console.log('shioot')
             laser ? (
                 laser.fire(this.player.x, this.player.y),
-                this.laserFired =  200
+                this.laserFired = 200
             )
-            :0
+                : 0
 
         }
     }
 
-    createEnemy(){
+    createEnemy() {
 
         this.enemy = this.load.image(300, 200, 'enemy');
         this.enemy = this.physics.add.group({
@@ -292,45 +301,78 @@ export default class Testing1 extends Phaser.Scene {
         });
     }
 
-    createTime(){
+    createTime() {
         this.time.addEvent({
-            delay : Phaser.Math.Between(1000, 5000),
-            callBack : this.spawnEnemy(),
+            delay: Phaser.Math.Between(1000, 5000),
+            callBack: this.spawnEnemy(),
             callbackScope: true,
-            loop : true
+            loop: true
         })
     }
 
-    spawnEnemy(){
-        const config={
+    spawnEnemy() {
+        const config = {
             speed: 30,
-            rotation : 0.55
+            rotation: 0.55
         };
 
-        const enemy = this.enemy.get(0,0, 'enemy', config);
+        const enemy = this.enemy.get(0, 0, 'enemy', config);
         console.log('enemy:', enemy);
         const positionX = Phaser.Math.Between(50, 350);
         enemy ? enemy.spawn(positionX) : 0;
     }
 
-    createLaser(){
+    createLaser() {
         this.laser = this.physics.add.group({
-            classType : Laser,
-            maxSize : 10,
-            runChildUpdate : true
+            classType: Laser,
+            maxSize: 10,
+            runChildUpdate: true
         })
     }
 
-    hitEnemy(laser, enemy){
+    hitEnemy(laser, enemy) {
         laser.destroy();
         enemy.destroy();
+        this.score += 10;
+        this.life -= 1;
     }
+
+    createScoreText() {
+        this.scoreText = this.add.text(10, 10, 'Score:', {
+            // when the text is not showing to the browser make sure that you type tthe name of colour correctly  + called the method inside create
+
+            fontSize: '20px',
+            fill: 'blue',
+            backgroundColor: 'white'
+        }).setActive().setDepth(1)
+
+        this.playerLifeStatus = this.add.text(10, 45, `Life : ${this.playerLife}`, {
+            fontSize: '20px',
+            fill: 'red',
+            backgroundColor: 'white'
+        }).setActive().setDepth(1)
+    }
+
+    playerCollision(p, e) {
+        e.destroy();
+        this.playerLife--;
+        // if your screen is black after losing the game make sure you have to type it correctly!
+        this.playerLife == 2 ? p.setTint(0xff000) :
+            this.playerLife == 1 ? p.setTint(0xff000).setAlpha(0.2)
+                : this.scene.start('game-over-scene', {score: this.score})
+    }
+
 
     update() {
         this.moveCloud()
         this.playerMovement()
         this.spawnEnemy();
-        
+
+
+        // update the score whenever kill the enemy
+        // when your score is not updating jsut check it whether yyou already called it or not
+        this.scoreText.setText(`Score : ${this.score}`)
+        this.playerLifeStatus.setText(`Life : ${this.playerLife}`)
 
         // console.log('time', this.time)
     }
