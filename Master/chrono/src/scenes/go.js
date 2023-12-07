@@ -3,7 +3,7 @@ import Phaser from "phaser";
 // const imageAsset =[{}]
 export default class GameOver extends Phaser.Scene {
     constructor() {
-        super(`game-over-scene`)
+        super(`gameover`)
     }
 
     init(data) {
@@ -23,17 +23,21 @@ export default class GameOver extends Phaser.Scene {
 
     create() {
         this.add.image(this.scale.width, this.scale.width, 'background');
-        this.add.image(250, 400, 'gamover');
-        this.add.text(250, 450, `score : ${this.score}`,{
-            fontSize : '32px', fill : 'black'
+        this.add.text(20, 45, "Made by Miku", {
+            fontSize: '32px',
+            fill: 'black'
+        })
+        this.add.image(200, 250, 'gameover');
+        this.add.text(20, 450, `score : ${this.score}`, {
+            fontSize: '32px', fill: 'black'
         })
         this.createReplayButton();
     }
 
-    createReplayButton(){
-        this.replayButton =   this.add.image(250, 550, 'replay').setInteractive().setScale();   
+    createReplayButton() {
+        this.replayButton = this.add.image(250, 550, 'replay').setInteractive().setScale();
 
-        this.replayButton.once('pointerup', ()=>{
+        this.replayButton.once('pointerup', () => {
             this.scene.start(`test1`);
         })
     }

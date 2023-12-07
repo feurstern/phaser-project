@@ -130,6 +130,7 @@ export default class Testing1 extends Phaser.Scene {
 
         this.playerLifeStatus = '';
         this.playerLife = 3
+        this.handsanitizer = '';
 
     }
 
@@ -181,7 +182,12 @@ export default class Testing1 extends Phaser.Scene {
         this.physics.add.overlap(this.laser, this.enemy, this.hitEnemy, null, this)
         this.createScoreText();
 
+        // for detecting the collision between enemy and the playeer
         this.physics.add.overlap(this.player, this.enemy, this.playerCollision, null, this)
+        this.createSanitizer();
+
+        // create collision between game and hand sanitier
+        this.physics.add.overlap(this.player, this.handsanitizer, this.handsanitizerCollision, null, this);
     }
 
 
@@ -281,7 +287,7 @@ export default class Testing1 extends Phaser.Scene {
         // console.log('time :', this.time)
         if ((this.shootBtn) && this.laserFired) {
             const laser = this.laser.get(0, 0, 'laserbolt');
-            console.log('shioot')
+            // console.log('shioot')
             laser ? (
                 laser.fire(this.player.x, this.player.y),
                 this.laserFired = 200
@@ -312,12 +318,12 @@ export default class Testing1 extends Phaser.Scene {
 
     spawnEnemy() {
         const config = {
-            speed: 30,
-            rotation: 0.55
+            speed: 90,
+            rotation: 5
         };
 
         const enemy = this.enemy.get(0, 0, 'enemy', config);
-        console.log('enemy:', enemy);
+        // console.log('enemy:', enemy);
         const positionX = Phaser.Math.Between(50, 350);
         enemy ? enemy.spawn(positionX) : 0;
     }
@@ -353,13 +359,47 @@ export default class Testing1 extends Phaser.Scene {
         }).setActive().setDepth(1)
     }
 
+
+    //decreaslife() 
     playerCollision(p, e) {
         e.destroy();
         this.playerLife--;
         // if your screen is black after losing the game make sure you have to type it correctly!
-        this.playerLife == 2 ? p.setTint(0xff000) :
-            this.playerLife == 1 ? p.setTint(0xff000).setAlpha(0.2)
-                : this.scene.start('game-over-scene', {score: this.score})
+        this.playerLife === 2 ? p.setTint(0xff000) :
+            this.playerLife === 1 ? p.setTint(0xff000).setAlpha(0.2)
+                : this.scene.start(`gameover`, { score: this.score })
+    }
+
+    createSanitizer() {
+        this.handsanitizer = this.physics.add.group({
+            classType: FallingObject,
+            runChildUpdate: true
+        })
+
+        this.time.addEvent({
+            delay: Phaser.Math.Between(7000, 11000),
+            callBack: this.spawnHandSanitizer(),
+            callbackScope: true,
+            loop: true
+        })
+    }
+
+    spawnHandSanitizer() {
+        const config = {
+            speed: 100,
+            rotation: 1
+        }
+
+        const handsanitizer = this.handsanitizer.get(0, 0, 'hand', config)
+        const randomPositionX = Phaser.Math.Between(70, 350);
+
+        handsanitizer ? handsanitizer.spawn(randomPositionX) : 0;
+    }
+
+    handsanitizerCollision(h, p) {
+        // h.destroy();
+        p.destroy();
+        this.life += 1;
     }
 
 

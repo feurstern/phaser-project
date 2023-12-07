@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import FallingObject from "./FallingObject";
 
 
 const baseScale = 0.5;
@@ -117,6 +118,8 @@ export default class MainPlaneScene extends Phaser.Scene {
         this.cloud = ''
 
         this.cursor = '';
+
+        this.laser = '';
     }
 
     preload() {
@@ -147,6 +150,7 @@ export default class MainPlaneScene extends Phaser.Scene {
         this.createButton();
         this.player = this.createPlayer();
         this.cursor = this.input.keyboard.createCursorKeys();
+        this.physics.add.overlap()
     }
 
     createCloud() {
@@ -246,6 +250,19 @@ export default class MainPlaneScene extends Phaser.Scene {
             console.log('you pressed the shoot button')
         }
 
+    }
+
+    createEnemy(){
+        this.enemy = this.physics.add.group({
+            classType : FallingObject,
+            maxSize: 10,
+            runChildUpdate : true
+        })
+    }
+
+    killEnemy(laser, enemy) {
+        laser.destroy();
+        enemy.destory();
     }
 
     update() {
