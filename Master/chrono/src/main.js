@@ -5,6 +5,8 @@ import Test from "./scenes/test";
 import MainPlaneScene from "./scenes/Plane";
 import Testing1 from "./scenes/c1";
 import GameOver from "./scenes/go";
+import DebugHand from "./scenes/h";
+
 const config= {
     type : Phaser.AUTO,
     width : 400,
@@ -19,7 +21,7 @@ const config= {
         mode:Phaser.Scale.FIT,
         autoCenter : Phaser.Scale.CENTER_BOTH
     },
-    scene : [Testing1, GameOver]
+    scene : [Testing1, GameOver, DebugHand]
 }
 
 export default new Phaser.Game(config);

@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import FallingObject from "./FallingObject";
 import Laser from "./L1";
 import GameOver from "./go";
+
 const assetImage = [
     {
         key: 'bg',
@@ -174,10 +175,10 @@ export default class Testing1 extends Phaser.Scene {
         this.createButton();
         this.createPlayer();
         this.createEnemy();
-        this.createTime();
+     
         this.createLaser();
         // this.hitEnemy(Laser, FallingObject);
-
+        this.createTime();
         //whenever you want to implement collision
         this.physics.add.overlap(this.laser, this.enemy, this.hitEnemy, null, this)
         this.createScoreText();
@@ -185,6 +186,7 @@ export default class Testing1 extends Phaser.Scene {
         // for detecting the collision between enemy and the playeer
         this.physics.add.overlap(this.player, this.enemy, this.playerCollision, null, this)
         this.createSanitizer();
+        
 
         // create collision between game and hand sanitier
         this.physics.add.overlap(this.player, this.handsanitizer, this.handsanitizerCollision, null, this);
@@ -368,9 +370,11 @@ export default class Testing1 extends Phaser.Scene {
         this.playerLife === 2 ? p.setTint(0xff000) :
             this.playerLife === 1 ? p.setTint(0xff000).setAlpha(0.2)
                 : this.scene.start(`gameover`, { score: this.score })
+        this.score > 90 ? this.life += 1 : 0
     }
 
     createSanitizer() {
+        this.handsanitizer = this.add.image(0,0, 'hand');
         this.handsanitizer = this.physics.add.group({
             classType: FallingObject,
             runChildUpdate: true
@@ -391,6 +395,7 @@ export default class Testing1 extends Phaser.Scene {
         }
 
         const handsanitizer = this.handsanitizer.get(0, 0, 'hand', config)
+        console.log('hand:', handsanitizer)
         const randomPositionX = Phaser.Math.Between(70, 350);
 
         handsanitizer ? handsanitizer.spawn(randomPositionX) : 0;
@@ -399,7 +404,10 @@ export default class Testing1 extends Phaser.Scene {
     handsanitizerCollision(h, p) {
         // h.destroy();
         p.destroy();
-        this.life += 1;
+        if (this.life != 3) {
+            this.life += 1;
+
+        }
     }
 
 
