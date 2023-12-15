@@ -161,6 +161,9 @@ export default class Testing1 extends Phaser.Scene {
             }
         })
 
+        this.load.audio('laser', 'music/laser.mp3');
+        this.load.audio('killed', 'music/killed.mp3')
+
     }
 
 
@@ -175,7 +178,7 @@ export default class Testing1 extends Phaser.Scene {
         this.createButton();
         this.createPlayer();
         this.createEnemy();
-     
+
         this.createLaser();
         // this.hitEnemy(Laser, FallingObject);
         this.createTime();
@@ -186,7 +189,7 @@ export default class Testing1 extends Phaser.Scene {
         // for detecting the collision between enemy and the playeer
         this.physics.add.overlap(this.player, this.enemy, this.playerCollision, null, this)
         this.createSanitizer();
-        
+
 
         // create collision between game and hand sanitier
         this.physics.add.overlap(this.player, this.handsanitizer, this.handsanitizerCollision, null, this);
@@ -292,7 +295,8 @@ export default class Testing1 extends Phaser.Scene {
             // console.log('shioot')
             laser ? (
                 laser.fire(this.player.x, this.player.y),
-                this.laserFired = 200
+                this.laserFired = 200,
+                this.sound.play('laser')
             )
                 : 0
 
@@ -343,6 +347,7 @@ export default class Testing1 extends Phaser.Scene {
         enemy.destroy();
         this.score += 10;
         this.life -= 1;
+        this.sound.play('killed')
     }
 
     createScoreText() {
@@ -374,7 +379,7 @@ export default class Testing1 extends Phaser.Scene {
     }
 
     createSanitizer() {
-        this.handsanitizer = this.add.image(0,0, 'hand');
+        // this.handsanitizer = this.add.image(0,0, 'hand');
         this.handsanitizer = this.physics.add.group({
             classType: FallingObject,
             runChildUpdate: true
@@ -383,7 +388,7 @@ export default class Testing1 extends Phaser.Scene {
         this.time.addEvent({
             delay: Phaser.Math.Between(7000, 11000),
             callBack: this.spawnHandSanitizer(),
-            callbackScope: true,
+            callbackScope: this,
             loop: true
         })
     }
@@ -395,17 +400,19 @@ export default class Testing1 extends Phaser.Scene {
         }
 
         const handsanitizer = this.handsanitizer.get(0, 0, 'hand', config)
-        console.log('hand:', handsanitizer)
-        const randomPositionX = Phaser.Math.Between(70, 350);
+        const positionX = Phaser.Math.Between(70, 330)
+        if (handsanitizer) {
+            handsanitizer.spawn(positionX);
+        }
 
-        handsanitizer ? handsanitizer.spawn(randomPositionX) : 0;
     }
 
     handsanitizerCollision(h, p) {
         // h.destroy();
         p.destroy();
-        if (this.life != 3) {
-            this.life += 1;
+        if (this.playerLife != 3) {
+            this.playerLife += 1;
+            // this.playerLifeStatus +=1;
 
         }
     }
