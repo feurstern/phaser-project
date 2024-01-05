@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import FallingObject from "./FallingObject";
 import Laser from "./L1";
 import GameOver from "./go";
+import GameOverScene from "./Gameover";
 
 const assetImage = [
     {
@@ -161,9 +162,9 @@ export default class Testing1 extends Phaser.Scene {
             }
         })
 
-        this.load.audio('laser', 'music/laser.mp3');
-        this.load.audio('killed', 'music/killed.mp3')
-
+        this.load.audio('laser', 'music/laser-gun.mp3');
+        this.load.audio('kill', 'music/blood.mp3');
+        
     }
 
 
@@ -296,7 +297,8 @@ export default class Testing1 extends Phaser.Scene {
             laser ? (
                 laser.fire(this.player.x, this.player.y),
                 this.laserFired = 200,
-                this.sound.play('laser')
+                this.sound.play('laser') 
+                
             )
                 : 0
 
@@ -308,7 +310,7 @@ export default class Testing1 extends Phaser.Scene {
         this.enemy = this.load.image(300, 200, 'enemy');
         this.enemy = this.physics.add.group({
             classType: FallingObject,
-            maxSize: 12,
+            maxSize: 17,
             runChildUpdate: true
         });
     }
@@ -316,7 +318,7 @@ export default class Testing1 extends Phaser.Scene {
     createTime() {
         this.time.addEvent({
             delay: Phaser.Math.Between(1000, 5000),
-            callBack: this.spawnEnemy(),
+            callBack: this.spawnEnemy,
             callbackScope: true,
             loop: true
         })
@@ -343,11 +345,12 @@ export default class Testing1 extends Phaser.Scene {
     }
 
     hitEnemy(laser, enemy) {
+        this.sound.play('kill');
         laser.destroy();
         enemy.destroy();
         this.score += 10;
         this.life -= 1;
-        this.sound.play('killed')
+        
     }
 
     createScoreText() {
@@ -370,23 +373,25 @@ export default class Testing1 extends Phaser.Scene {
     //decreaslife() 
     playerCollision(p, e) {
         e.destroy();
+        
         this.playerLife--;
         // if your screen is black after losing the game make sure you have to type it correctly!
         this.playerLife === 2 ? p.setTint(0xff000) :
             this.playerLife === 1 ? p.setTint(0xff000).setAlpha(0.2)
-                : this.scene.start(`gameover`, { score: this.score })
-        this.score > 90 ? this.life += 1 : 0
+                : this.scene.start(`game-over-scene`, {score : this.score})
+    
     }
 
     createSanitizer() {
         // this.handsanitizer = this.add.image(0,0, 'hand');
         this.handsanitizer = this.physics.add.group({
             classType: FallingObject,
+            // maxSize: 10,
             runChildUpdate: true
         })
 
         this.time.addEvent({
-            delay: Phaser.Math.Between(7000, 11000),
+            delay: 5000,
             callBack: this.spawnHandSanitizer(),
             callbackScope: this,
             loop: true
@@ -432,3 +437,4 @@ export default class Testing1 extends Phaser.Scene {
         // console.log('time', this.time)
     }
 }
+
