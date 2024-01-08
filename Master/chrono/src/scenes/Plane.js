@@ -106,7 +106,7 @@ const playerAnimation = [
 
 export default class MainPlaneScene extends Phaser.Scene {
     constructor() {
-        super(`Corona Buster `)
+        super(`corona-buster`);
     }
     init() {
 

@@ -1,6 +1,7 @@
 import Phaser from "phaser"
 
 import MainPlane from "./scenes/GamePlay"
+import MainGame from "./scenes/game"
 
 const config = {
     type : Phaser.AUTO,
@@ -9,7 +10,7 @@ const config = {
     physics:{
         default: 'arcade',
         arcade : {
-            gravirt : {y:0}
+            gravity : {y:0}
         },
     },
     scale:{

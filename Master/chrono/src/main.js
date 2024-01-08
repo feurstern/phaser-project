@@ -4,6 +4,7 @@ import Phaser from "phaser";
 import Test from "./scenes/test";
 import MainPlaneScene from "./scenes/Plane";
 // plane
+import Testing3 from "./scenes/c3";
 import Testing1 from "./scenes/c1";
 import GameOver from "./scenes/go";
 import DebugHand from "./scenes/h";
@@ -24,7 +25,7 @@ const config= {
         mode:Phaser.Scale.FIT,
         autoCenter : Phaser.Scale.CENTER_BOTH
     },
-    scene : [Test1, GameOver, DebugHand,  GameOverScene]
+    scene : [Testing3, GameOver, DebugHand,  GameOverScene]
 }
 
 export default new Phaser.Game(config);
