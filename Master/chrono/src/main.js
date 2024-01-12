@@ -25,7 +25,7 @@ const config= {
         mode:Phaser.Scale.FIT,
         autoCenter : Phaser.Scale.CENTER_BOTH
     },
-    scene : [Testing3, GameOver, DebugHand,  GameOverScene]
+    scene : [Test1, GameOver, DebugHand,  GameOverScene]
 }
 
 export default new Phaser.Game(config);

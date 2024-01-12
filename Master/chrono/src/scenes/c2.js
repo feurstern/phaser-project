@@ -1,64 +1,6 @@
 import Phaser from "phaser";
+import { playerAnimation, enemyAnimation, imageAsset } from "./loadAsset";
 
-const imageAsset = [
-    {
-        keyName: 'bg',
-        path: 'img/bg_layer1.png',
-        isStatic: true,
-        frameWidth: 0,
-        frameHeight: 0
-    },
-    {
-        keyName: 'fight-bg',
-        path: 'img/fight-bg.png',
-        isStatic: true,
-        frameWidth: 0,
-        frameHeight: 0
-    },
-    {
-        keyName: 'tile',
-        path: 'img/tile.png',
-        isStatic: true,
-        frameWidth: 0,
-        frameHeight: 0
-    },
-    {
-        keyName: 'startBtn',
-        path: 'img/start_button.png',
-        isStatic: true,
-        frameWidth: 0,
-        frameHeight: 0
-    },
-    {
-        keyName: 'player',
-        path: 'img/warrior1.png',
-        isStatic: false,
-        frameWidth: 80,
-        frameHeight: 80
-    },
-    {
-        keyName: 'enemy',
-        path: 'img/warrior2.png',
-        isStatic: false,
-        frameWidth: 80,
-        frameHeight: 80
-    },
-    {
-        keyName: 'numbers',
-        path: 'img/numbers.png',
-        isStatic: false,
-        frameWidth: 131,
-        frameHeight: 71.25
-    },
-    {
-        keyName: 'slash',
-        path: 'img/slash.png',
-        isStatic: false,
-        frameWidth: 42,
-        frameHeight: 88
-    }
-
-]
 export default class Test1 extends Phaser.Scene {
 
     constructor() {
@@ -71,6 +13,23 @@ export default class Test1 extends Phaser.Scene {
         this.slash = 1;
         this.screenHalfWidth = this.scale.width * 0.5;
         this.screenHalfHeight = this.scale.height * 0.5;
+
+        this.starGame = false;
+        this.questionText = undefined;
+        this.resulText = 0;
+
+        this.button1 = undefined
+        this.button2 = undefined
+        this.button3 = undefined
+        this.button4 = undefined
+        this.button5 = undefined
+        this.button6 = undefined
+        this.button7 = undefined
+        this.button8 = undefined
+        this.button9 = undefined
+        this.button0 = undefined
+        this.buttonDel = undefined
+        this.buttonOk = undefined
     }
 
     preload() {
@@ -99,6 +58,9 @@ export default class Test1 extends Phaser.Scene {
         this.createPlayer();
         this.createEnemy();
         this.physics.add.collider(this.player, tile);
+        this.createSlash();
+        this.createAnimation()
+        this.createButton()
     }
 
     createPlayer() {
@@ -107,12 +69,88 @@ export default class Test1 extends Phaser.Scene {
             this.screenHalfHeight - 50, 'player').setBounce(0.2).setOffset(-20, -10)
     }
 
-    createEnemy(){
+    createEnemy() {
         this.enemy = this.physics.add.sprite(
             this.screenHalfWidth + 150,
             this.screenHalfHeight - 50, 'enemy'
         ).setBounce(0.5).setFlipX(true);
     }
+
+    createSlash() {
+        this.slash = this.physics.add.sprite(240, 60, 'slash')
+            .setActive(false)
+            .setVisible(true)
+            .setGravity(-500)
+            .setOffset(0, -10)
+            .setDepth(1)
+            .setCollideWorldBounds(true);
+    }
+
+    createAnimation() {
+        playerAnimation.forEach(x => {
+            this.anims.create({
+                key: x.keyName,
+                frames: this.anims.generateFrameNumbers('player',
+                    {
+                        start: x.frameStart,
+                        end: x.frameEnd
+                    }),
+                frameRate: x.frameRate,
+                repeat: x.repeat != 0 ? x.repeat : null,
+            })
+        });
+
+        enemyAnimation.forEach(x => {
+            this.anims.create({
+                key: x.keyName,
+                frames: this.anims.generateFrameNumbers('enemy',
+                    {
+                        start: x.frameStart,
+                        end: x.frameEnd
+                    }),
+                frameRate: x.frameRate,
+                repeat: x.repeat != 0 ? x.repeat : null,
+            })
+        });
+        console.log('animation has been created!')
+    }
+
+
+    createButton() {
+        let startBtn = this.add.image(this.screenHalfWidth, this.screenHalfHeight + 141, 'startBtn').setInteractive();
+
+        startBtn.once('pointerup', () => {
+            // alert('pressed!');
+            this.gameStartTrigger();
+
+        })
+    }
+
+
+    gameStartTrigger() {
+        this.starGame = true;
+        this.player.anims.play('player-standby', true);
+        this.enemy.anims.play('enemy-standby', true);
+
+        //creating a text 
+        this.resulText = this.add.text(this.screenHalfWidth, 200, '0', {
+            fontSize: '32px',
+            fill: 'black'
+        })
+
+        this.questionText = this.add.text(this.screenHalfWidth, 100, 0, {
+            fontSize: '32px',
+            fill: 'black'
+        })
+
+    }
+
+
+
+
+
+
+
 
 
 }
