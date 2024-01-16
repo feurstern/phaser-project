@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import FallingObject from "./FallingObject";
 import L3 from "./L3.JS";
 import Laser from "./Laser";
+import OverScene from "./OverScene";
 
 
 
@@ -127,12 +128,11 @@ export default class Testing3 extends Phaser.Scene {
         this.laserFired = 10;
         // this.time = time;
 
-        this.scoreText = 'ds';
-        this.score = 0;
+        this.scoreText = 'sds';
+        this.score = 0
 
-
-        this.playerLifeStatus = '';
-        this.playerLife = 3
+        this.lifeText = 'sdsd';
+        this.life = 3;
         this.handsanitizer = '';
 
     }
@@ -187,7 +187,7 @@ export default class Testing3 extends Phaser.Scene {
         //whenever you want to implement collision
 
         // for detecting the collision between enemy and the playeer
-        this.physics.add.overlap(this.player, this.enemy, this.playerCollision, null, this)
+        // this.physics.add.overlap(this.player, this.enemy, this.playerCollision, null, this)
         this.createSanitizer();
 
 
@@ -195,9 +195,10 @@ export default class Testing3 extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.handsanitizer, this.handsanitizerCollision, null, this);
 
         this.createLaser();
-        this.physics.add.overlap(this.laser, this.enemy, this.hitEnemy,null, this)
+        this.physics.add.overlap(this.laser, this.enemy, this.hitEnemy, null, this)
 
-
+        this.createCurrentStatus()
+        this.physics.add.overlap(this.player, this.enemy, this.playerCollisionDetect, null, this);
     }
 
 
@@ -340,7 +341,34 @@ export default class Testing3 extends Phaser.Scene {
         enemy ? enemy.spawn(positionX) : 0;
     }
 
+    playerCollisionDetect(player, enemy) {
+        enemy.destroy();
+        this.life--;
+        // console.log('life:', this.life)
 
+        // implement the settint, and checking the current life
+
+        this.life == 2 ? player.setTint(0xff0000) :
+            this.life == 1 ? player.setTint(0xff0000) :
+                this.life == 0 ? this.scene.start(`over_scene`, {score : this.score}) : false
+        
+        // if(this.life ==2){
+        //     player.setTint()
+        // }
+
+    }
+    createCurrentStatus() {
+        this.scoreText = this.add.text(10, 10, `score: ${this.score}`,
+            {
+                fontSize: '20px',
+                fill: 'black'
+            });
+
+        this.lifeText = this.add.text(10, this.scoreText.y + 20, `Life : 3`, {
+            fontSize: '20px',
+            fill: "red"
+        })
+    }
 
 
 
@@ -398,9 +426,11 @@ export default class Testing3 extends Phaser.Scene {
         });
     }
 
-    hitEnemy(laser, enemy){
+    hitEnemy(laser, enemy) {
         laser.destroy();
         enemy.destroy();
+        this.score += 1;
+        console.log('current score:', this.score)
     }
 
     spawnHandSanitizer() {
@@ -432,6 +462,10 @@ export default class Testing3 extends Phaser.Scene {
         this.moveCloud()
         this.playerMovement()
         this.spawnEnemy();
+
+        // override
+        this.scoreText.setText(`Score : ${this.score}`)
+        this.lifeText.setText(`Life : ${this.life}`)
 
 
         // update the score whenever kill the enemy

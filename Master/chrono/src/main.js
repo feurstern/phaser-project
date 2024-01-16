@@ -9,6 +9,7 @@ import Testing1 from "./scenes/c1";
 import GameOver from "./scenes/go";
 import DebugHand from "./scenes/h";
 import GameOverScene from "./scenes/Gameover";
+import OverScene from "./scenes/OverScene";
 // math fighter
 import Test1 from "./scenes/c2";
 const config= {
@@ -25,7 +26,7 @@ const config= {
         mode:Phaser.Scale.FIT,
         autoCenter : Phaser.Scale.CENTER_BOTH
     },
-    scene : [Test1, GameOver, DebugHand,  GameOverScene]
+    scene : [Testing3, OverScene, GameOver, DebugHand,  GameOverScene]
 }
 
 export default new Phaser.Game(config);
