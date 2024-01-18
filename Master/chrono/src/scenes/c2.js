@@ -60,7 +60,7 @@ export default class Test1 extends Phaser.Scene {
         this.physics.add.collider(this.player, tile);
         this.createSlash();
         this.createAnimation()
-        this.createButton()
+        this.createStartButtonTrigger();
     }
 
     createPlayer() {
@@ -116,12 +116,14 @@ export default class Test1 extends Phaser.Scene {
     }
 
 
-    createButton() {
+    createStartButtonTrigger() {
         let startBtn = this.add.image(this.screenHalfWidth, this.screenHalfHeight + 141, 'startBtn').setInteractive();
 
         startBtn.once('pointerup', () => {
             // alert('pressed!');
+            startBtn.destroy();
             this.gameStartTrigger();
+            this.createButtonNumber()
 
         })
     }
@@ -143,8 +145,41 @@ export default class Test1 extends Phaser.Scene {
             fill: 'black'
         })
 
+
     }
 
+    createButtonNumber() {
+        const startPosY = this.scale.height - 246;
+        const widthDifference = 131;
+        const heightDifference = 71.25;
+
+        // middle button
+        this.button2 = this.add.image(this.screenHalfWidth, startPosY, 'numbers', 1).setInteractive().setData(`value`, 5);
+        this.button5 = this.add.image(this.screenHalfWidth, this.button2.y + heightDifference, 'numbers', 4).setInteractive().setData(`value`, 5);
+        this.button8 = this.add.image(this.screenHalfWidth, this.button5.y + heightDifference, 'numbers', 7).setInteractive().setData(`value`, 8);
+        this.button0 = this.add.image(this.screenHalfWidth, this.button8.y + heightDifference, 'numbers', 10).setInteractive().setData('value', 0);
+        // end of button 
+
+        //left
+        this.button1 = this.add.image(this.screenHalfWidth - widthDifference, startPosY, 'numbers', 0).setInteractive().setData(`value`, 1);
+        this.button4 = this.add.image(this.screenHalfWidth - widthDifference, this.button1.y + heightDifference, 'numbers', 3).setInteractive().setData(`value`, 4);
+        this.button7 = this.add.image(this.screenHalfWidth - widthDifference, this.button4.y + heightDifference, 'numbers', 6).setInteractive().setData(`value`, 7);
+        this.buttonDel = this.add.image(this.screenHalfWidth - widthDifference, this.button7.y + heightDifference, 'numbers', 9).setInteractive().setData(`value`, `del`);
+        // end of left side button
+
+
+        // right side
+        this.button3 = this.add.image(this.screenHalfWidth + widthDifference, startPosY, 'numbers', 2).setInteractive().setData(`value`, 3);
+        this.button6 = this.add.image(this.screenHalfWidth + widthDifference, this.button3.y + heightDifference, 'numbers', 5).setInteractive().setData(`value`, 6);
+        this.button9 = this.add.image(this.screenHalfWidth + widthDifference, this.button6.y + heightDifference, 'numbers', 8).setInteractive().setData(`value`, 9);
+        this.buttonOk = this.add.image(this.screenHalfWidth + widthDifference, this.button9.y + heightDifference, 'numbers', 11).setInteractive().setData(`value`, `ok`);
+        // 
+
+        this.buttonOk.on('pointerdown', ()=>{
+            alert(this.getData('value'))
+        },this)
+
+    }
 
 
 
