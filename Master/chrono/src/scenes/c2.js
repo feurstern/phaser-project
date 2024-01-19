@@ -30,6 +30,13 @@ export default class Test1 extends Phaser.Scene {
         this.button0 = undefined
         this.buttonDel = undefined
         this.buttonOk = undefined
+
+        // 
+        this.number = 0
+        this.numberArray = []
+
+        this.question = [];
+
     }
 
     preload() {
@@ -145,7 +152,9 @@ export default class Test1 extends Phaser.Scene {
             fill: 'black'
         })
 
-
+        this.input.on(`gameobjectdown`, this.addNumber, this)
+        this.generateQuestion();
+        // this.input.on('gameobjectdown', this.generateQuestion, this)
     }
 
     createButtonNumber() {
@@ -175,17 +184,101 @@ export default class Test1 extends Phaser.Scene {
         this.buttonOk = this.add.image(this.screenHalfWidth + widthDifference, this.button9.y + heightDifference, 'numbers', 11).setInteractive().setData(`value`, `ok`);
         // 
 
-        this.buttonOk.on('pointerdown', ()=>{
-            alert(this.getData('value'))
-        },this)
+        // this.buttonOk.on('pointerdown', () => {
+        //     alert(this.getData('value'))
+        // }, this)
 
     }
 
 
+    addNumber(pointer, object, event) {
+
+        let value = object.getData(`value`)
+
+        // checking whether the button that we pressed is number or not 
+        if (isNaN(value)) {
+            value == `del` ? this.numberArray.pop() : 0
+            // set default number to 0 
+            this.numberArray.length < 1 ? this.numberArray[0] = 0 : 0;
+
+            value == 'ok' ? (
+                this.checkAnswer(),
+                this.numberArray = [],
+                this.numberArray[0] = 0
+            )
+
+                : 0
+
+        }
+        else {
+            // to check whether the amount of number 
+            if (this.numberArray.length == 1 && this.numberArray[0] == 0) {
+                // we reassign the value 
+                this.numberArray[0] == value
+            }
+            else if (this.numberArray.length < 10) {
+                // push the number into array
+                this.numberArray.push(value)
+            }
+
+        }
+
+        console.log('current array numbee:', this.numberArray);
+
+        this.number = parseInt(this.numberArray.join(''));
+
+        this.resulText.setText(this.number);
+        const textHalfWidth = this.resulText.width * 0.5;
+        this.resulText.setX(this.screenHalfWidth - textHalfWidth)
+        event.stopPropagation();
+
+    }
+
+    getRandomOperator() {
+        const operator = ['+', '-', 'x', ':']
+        return operator[Phaser.Math.Between(0, 3)]
+    }
+
+    generateQuestion() {
+        let question1 = Phaser.Math.Between(1, 20);
+        let question2 = Phaser.Math.Between(1, 20);
+        let operator = this.getRandomOperator();
+
+        switch (operator) {
+            case '+':
+                this.question[0] = `${question1} + ${question2}`;
+                this.question[1] = question1 + question2;
+                break;
+
+            case '-':
+                this.question[0] = `${question1} - ${question2}`;
+                this.question[1] = question1 - question2;
+                break;
+
+            case 'x':
+                this.question[0] = `${question1} x ${question2}`;
+                this.question[1] = question1 * question2;
+                break;
+
+            case ':':
+                this.question[0] = `${question1} : ${question2}`;
+                this.question[1] = question1 / question2;
+                break;
+
+            default:
+                break;
+        }
+        console.log('question', this.question[0])
+
+        this.questionText.setText(this.question[0]);
+    }
 
 
-
-
+    checkAnswer(){
+        if(this.number == this.question[1]){
+            alert('You winn!')
+        }
+    }
 
 
 }
