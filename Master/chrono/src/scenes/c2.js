@@ -37,6 +37,11 @@ export default class Test1 extends Phaser.Scene {
 
         this.question = [];
 
+        this.correctAnswer = false;
+
+
+        this.playerAttack = false;
+        this.enemyAttack = false;
     }
 
     preload() {
@@ -68,6 +73,8 @@ export default class Test1 extends Phaser.Scene {
         this.createSlash();
         this.createAnimation()
         this.createStartButtonTrigger();
+        this.physics.add.overlap(this.player, this.enemy, this.spriteHit, this, null)
+        this.physics.add.overlap(this.enemy, this.player, this.spriteHit, this, null)
     }
 
     createPlayer() {
@@ -92,6 +99,7 @@ export default class Test1 extends Phaser.Scene {
             .setDepth(1)
             .setCollideWorldBounds(true);
     }
+
 
     createAnimation() {
         playerAnimation.forEach(x => {
@@ -131,6 +139,7 @@ export default class Test1 extends Phaser.Scene {
             startBtn.destroy();
             this.gameStartTrigger();
             this.createButtonNumber()
+            this.generateQuestion();
 
         })
     }
@@ -153,7 +162,7 @@ export default class Test1 extends Phaser.Scene {
         })
 
         this.input.on(`gameobjectdown`, this.addNumber, this)
-        this.generateQuestion();
+
         // this.input.on('gameobjectdown', this.generateQuestion, this)
     }
 
@@ -163,7 +172,7 @@ export default class Test1 extends Phaser.Scene {
         const heightDifference = 71.25;
 
         // middle button
-        this.button2 = this.add.image(this.screenHalfWidth, startPosY, 'numbers', 1).setInteractive().setData(`value`, 5);
+        this.button2 = this.add.image(this.screenHalfWidth, startPosY, 'numbers', 1).setInteractive().setData(`value`, 2);
         this.button5 = this.add.image(this.screenHalfWidth, this.button2.y + heightDifference, 'numbers', 4).setInteractive().setData(`value`, 5);
         this.button8 = this.add.image(this.screenHalfWidth, this.button5.y + heightDifference, 'numbers', 7).setInteractive().setData(`value`, 8);
         this.button0 = this.add.image(this.screenHalfWidth, this.button8.y + heightDifference, 'numbers', 10).setInteractive().setData('value', 0);
@@ -197,24 +206,33 @@ export default class Test1 extends Phaser.Scene {
 
         // checking whether the button that we pressed is number or not 
         if (isNaN(value)) {
-            value == `del` ? this.numberArray.pop() : 0
-            // set default number to 0 
-            this.numberArray.length < 1 ? this.numberArray[0] = 0 : 0;
+            if (value == 'del') {
+                // set default number to 0
+                this.numberArray.pop();
+                if (this.numberArray.length < 1) {
+                    this.numberArray[0] = 0;
+                    // console.log('deleted')
+                }
 
-            value == 'ok' ? (
-                this.checkAnswer(),
-                this.numberArray = [],
+            }
+
+            if (value == 'ok') {
+
+                this.checkAnswer()
+                this.numberArray = []
                 this.numberArray[0] = 0
-            )
+                this.generateQuestion();
+            }
 
-                : 0
 
         }
         else {
             // to check whether the amount of number 
             if (this.numberArray.length == 1 && this.numberArray[0] == 0) {
                 // we reassign the value 
-                this.numberArray[0] == value
+                this.numberArray.shift();
+                this.numberArray.push(value);
+                console.log('Number added!', value, 'length: ', this.numberArray.length)
             }
             else if (this.numberArray.length < 10) {
                 // push the number into array
@@ -240,6 +258,7 @@ export default class Test1 extends Phaser.Scene {
     }
 
     generateQuestion() {
+
         let question1 = Phaser.Math.Between(1, 20);
         let question2 = Phaser.Math.Between(1, 20);
         let operator = this.getRandomOperator();
@@ -251,8 +270,15 @@ export default class Test1 extends Phaser.Scene {
                 break;
 
             case '-':
-                this.question[0] = `${question1} - ${question2}`;
-                this.question[1] = question1 - question2;
+                if (question1 < question2) {
+                    this.question[0] = `${question2} - ${question1}`;
+                    this.question[1] = question2 - question1;
+
+                }
+                else {
+                    this.question[0] = `${question1} - ${question2}`;
+                    this.question[1] = question1 - question2;
+                }
                 break;
 
             case 'x':
@@ -261,24 +287,113 @@ export default class Test1 extends Phaser.Scene {
                 break;
 
             case ':':
-                this.question[0] = `${question1} : ${question2}`;
-                this.question[1] = question1 / question2;
+                let number = 0;
+                do {
+                    question1 = Phaser.Math.Between(0, 50);
+                    question2 = Phaser.Math.Between(0, 50);
+                    // number = question1/ question2;
+                    // console.log('number:', number);
+                }
+                while (!Number.isInteger(question1 / question2)) {
+                    this.question[0] = `${question1} / ${question2}`;
+                    this.question[1] = question1 / question2
+                }
+                // if (question1 < question2) {
+                //     this.question[0] = `${question2} : ${question1}`;
+                //     this.question[1] = question2 / question1;
+
+                // }
+                // else{
+                //     this.question[0] = `${question1} : ${question2}`;
+                //     this.question[1] = question1 / question2;
+
+                // }
                 break;
 
             default:
                 break;
         }
-        console.log('question', this.question[0])
+        // console.log('question', this.question[0])
 
         this.questionText.setText(this.question[0]);
     }
 
 
-    checkAnswer(){
-        if(this.number == this.question[1]){
+    checkAnswer() {
+        if (this.number == this.question[1]) {
             alert('You winn!')
+            this.correctAnswer = true;
         }
+        else {
+            alert('the answer is incorrect')
+            this.correctAnswer = false;
+        }
+
+    }
+
+    createAttakSlash(x, y, frame, velocity, flip = false) {
+        this.slash.setPosition(x, y).setActive(true)
+            .setVisible(true)
+            .setFrame(frame)
+            .setFlipX(flip)
+            .setVelocityX(velocity);
+    }
+
+    createAttackMovement() {
+        if (this.correctAnswer === true && !this.playerAttack) {
+            this.player.anims.play('player-attack', true);
+            this.time.delayedCall(500, () => {
+                this.createAttakSlash(this.player.x + 100, this.player.y, 4, 600)
+                console.log('player attack!')
+            })
+            this.playerAttack = true
+            // this.correctAnswer = undefined
+        }
+
+        if (this.correctAnswer === undefined) {
+            this.player.anims.play('player-standby', true);
+            this.enemy.anims.play('enemy-standby', true);
+        }
+
+        if (this.correctAnswer === false & !this.enemyAttack) {
+            this.enemy.anims.play('enemy-attack', true);
+            this.time.delayedCall(500, () => {
+                this.createSlash(this.enemy.x - 60, this.enemy.y, 2, -600, true);
+                console.log('enemy attack!', this.correctAnswer)
+            })
+
+            this.enemyAttack = true;
+        }
+    }
+
+    spriteHit(slash, sprite) {
+        slash.x = 0;
+        slash.y = 0;
+        slash.setActive(false);
+        slash.setVisible(false);
+        if (sprite.text.key == 'player') {
+            sprite.anims.play('player-hit', true)
+            console.log('player get hit!')
+        }
+        else {
+            sprite.anims.play('enemey-hit', true)
+            console.log('enemy get hit!')
+        }
+        this.time.delayedCall(500, ()=>{
+            this.playerAttack = false;
+            this.enemyAttack = false;
+            this.correctAnswer = undefined
+        })
+    }
+    update() {
+        // this.generateQuestion();
+        this.createAttackMovement()
     }
 
 
 }
+
+
+// notes
+// this.number is the  user answer
+
