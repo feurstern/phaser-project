@@ -12,6 +12,7 @@ import GameOverScene from "./scenes/Gameover";
 import OverScene from "./scenes/OverScene";
 // math fighter
 import Test1 from "./scenes/c2";
+import MathFigther from "./scenes/MathScene";
 const config= {
     type : Phaser.AUTO,
     width : 400,

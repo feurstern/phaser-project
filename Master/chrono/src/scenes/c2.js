@@ -42,6 +42,15 @@ export default class Test1 extends Phaser.Scene {
 
         this.playerAttack = false;
         this.enemyAttack = false;
+
+        this.score = 0;
+        this.scoreLabel = undefined;
+
+        // set the duration for the player to answer the question;
+        this.timer = 10;
+        this.timerLabel = undefined;
+        this.countDown = undefined;
+
     }
 
     preload() {
@@ -75,6 +84,7 @@ export default class Test1 extends Phaser.Scene {
         this.createStartButtonTrigger();
         this.physics.add.overlap(this.player, this.enemy, this.spriteHit, this, null)
         this.physics.add.overlap(this.enemy, this.player, this.spriteHit, this, null)
+        this.createTimer();
     }
 
     createPlayer() {
@@ -140,6 +150,7 @@ export default class Test1 extends Phaser.Scene {
             this.gameStartTrigger();
             this.createButtonNumber()
             this.generateQuestion();
+            this.createTextLabel()
 
         })
     }
@@ -159,9 +170,17 @@ export default class Test1 extends Phaser.Scene {
         this.questionText = this.add.text(this.screenHalfWidth, 100, 0, {
             fontSize: '32px',
             fill: 'black'
+
         })
 
-        this.input.on(`gameobjectdown`, this.addNumber, this)
+        this.input.on(`gameobjectdown`, this.addNumber, this);
+
+        this.countDown = this.time.addEvent({
+            delay: 1000,
+            callback: this.gameOver,
+            callbackScope: this,
+            loop: true
+        })
 
         // this.input.on('gameobjectdown', this.generateQuestion, this)
     }
@@ -198,7 +217,6 @@ export default class Test1 extends Phaser.Scene {
         // }, this)
 
     }
-
 
     addNumber(pointer, object, event) {
 
@@ -323,6 +341,9 @@ export default class Test1 extends Phaser.Scene {
         if (this.number == this.question[1]) {
             alert('You winn!')
             this.correctAnswer = true;
+            this.score += 1;
+            this.scoreLabel.setText(`score : ${this.score}`)
+            this.timer = 10;
         }
         else {
             alert('the answer is incorrect')
@@ -370,7 +391,7 @@ export default class Test1 extends Phaser.Scene {
         slash.x = 0;
         slash.y = 0;
         slash.setActive(false);
-        slash.setVisible(false);
+        slash.setV = isible(false);
         if (sprite.text.key == 'player') {
             sprite.anims.play('player-hit', true)
             console.log('player get hit!')
@@ -379,15 +400,37 @@ export default class Test1 extends Phaser.Scene {
             sprite.anims.play('enemey-hit', true)
             console.log('enemy get hit!')
         }
-        this.time.delayedCall(500, ()=>{
+        this.time.delayedCall(500, () => {
             this.playerAttack = false;
             this.enemyAttack = false;
             this.correctAnswer = undefined
         })
     }
+
+    createTextLabel() {
+        this.scoreLabel = this.add.text(250, 30, `score : ${this.score}`, {
+            fontSize: '20px',
+            color: "black"
+        });
+    }
+
+    createTimer() {
+        this.timerLabel = this.add.text(20, 10, `Time :${this.timer}`, {
+            fill: 'white',
+            backgroundColor: 'black'
+        }).setDepth(1)
+    }
+
+    gameOver() {
+        this.timer--;
+        this.timer < 0 ? alert('the game has ended!') : 0
+    }
+
     update() {
         // this.generateQuestion();
         this.createAttackMovement()
+        this.starGame = true ? this.timerLabel.setText(`Time : ${this.timer}`) : 0;
+        // this.scoreLabel.setText(`score : ${this.score}`);
     }
 
 
