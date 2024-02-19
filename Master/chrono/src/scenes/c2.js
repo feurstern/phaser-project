@@ -344,6 +344,7 @@ export default class Test1 extends Phaser.Scene {
             this.score += 1;
             this.scoreLabel.setText(`score : ${this.score}`)
             this.timer = 10;
+            
         }
         else {
             alert('the answer is incorrect')
