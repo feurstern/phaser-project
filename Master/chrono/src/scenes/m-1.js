@@ -1,9 +1,10 @@
 import Phaser from "phaser";
 import { imageAsset } from "./MathAsset";
 import { playerAnimation, enemyAnimation, assetAnimation } from "./Animation";
-export default class MathFigther extends Phaser.Scene {
+
+export default class MathFigther1 extends Phaser.Scene {
     constructor() {
-        super(`math-scene`)
+        super(`math-scene-1`)
 
     }
 
@@ -52,6 +53,13 @@ export default class MathFigther extends Phaser.Scene {
         // storing the answer key of the question
         this.answerKey = undefined;
 
+
+        this.score = 0;
+        this.scoreLabel = undefined;
+
+        this.timer = 10;
+        this.timerLabel = undefined;
+        this.countDown = 'sdsds';
 
 
 
@@ -181,13 +189,31 @@ export default class MathFigther extends Phaser.Scene {
         this.questionText = this.add.text(this.gameScreenHalfWidth, this.resultText.y + 40, `0`, {
             fontSize: '24px',
             fill: "red"
+        });
+
+
+        this.scoreLabel = this.add.text(10, 30, `the score : ${this.score}`, {
+            fontSize: '18px',
+            fill: 'red'
+        })
+
+        this.timerLabel = this.add.text(200, 30, `current time : ${this.timer}`, {
+            fontSize: '18px',
+            fill: "red"
         })
 
         this.input.on('gameobjectdown', this.addNumber, this);
 
         this.generateQuestion();
 
-    
+        this.countDown = this.time.addEvent({
+            delay: 1000,
+            callback: this.gameOver,
+            callbackScope: this,
+            loop: true
+        })
+
+
 
     }
 
@@ -246,9 +272,10 @@ export default class MathFigther extends Phaser.Scene {
                 this.checkAnswer();
 
                 // we generat the question again
-                 this.generateQuestion();
-                
+                this.generateQuestion();
 
+                this.numberArray = [];
+                this.numberArray[0] = 0;
                 // the script answer validation here
 
             }
@@ -259,7 +286,9 @@ export default class MathFigther extends Phaser.Scene {
             // if the array has only one element which is 0, replace it with a new number
             if (this.numberArray.length == 1 && this.numberArray[0] == 0) {
                 // redeclare or replace the number 0 to the selected one
-                this.numberArray = value;
+                // console.log('it goes here');
+                this.numberArray.shift();
+                this.numberArray.push(value);
             }
             // for storting the array and limit the array
             else if (this.numberArray.length < 10) {
@@ -333,16 +362,27 @@ export default class MathFigther extends Phaser.Scene {
     }
 
 
-    checkAnswer(){
-        if(this.answerKey == this.number){
+    checkAnswer() {
+        if (this.answerKey == this.number) {
             alert('You are correct');
+
+            this.score += 1;
+            this.scoreLabel.setText(`the score : ${this.score}`)
         }
-        else{
+        else {
             alert('You are incorrect')
         }
     }
 
+    gameOver() {
+        this.timer--;
+        this.timerLabel.setText(`current time : ${this.timer}`)
+        // console.log('current time:', this.timer);
+
+    }
+
 
     update() {
+
     }
 } 

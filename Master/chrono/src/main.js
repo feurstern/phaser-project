@@ -4,6 +4,7 @@ import Phaser from "phaser";
 import Test from "./scenes/test";
 import MainPlaneScene from "./scenes/Plane";
 // plane
+import mathfighterscene from "./platformer/scene";
 import Testing3 from "./scenes/c3";
 import Testing1 from "./scenes/c1";
 import GameOver from "./scenes/go";
@@ -13,6 +14,7 @@ import OverScene from "./scenes/OverScene";
 // math fighter
 import Test1 from "./scenes/c2";
 import MathFigther from "./scenes/MathScene";
+import MathFigther1 from "./scenes/m-1";
 const config= {
     type : Phaser.AUTO,
     width : 400,
@@ -27,7 +29,7 @@ const config= {
         mode:Phaser.Scale.FIT,
         autoCenter : Phaser.Scale.CENTER_BOTH
     },
-    scene : [MathFigther, OverScene, GameOver, DebugHand,  GameOverScene]
+    scene : [MathFigther1, OverScene, GameOver, DebugHand,  GameOverScene]
 }
 
 export default new Phaser.Game(config);
