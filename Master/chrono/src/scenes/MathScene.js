@@ -54,13 +54,27 @@ export default class MathFigther extends Phaser.Scene {
 
 
 
+        // create a score
+        this.score = 0;
+        // this for labelling the score text (string)
+        this.scoreLabel = 'ssds';
+
+
+        // set the default timer for the duration of the player to answer the question
+        this.timer = 10;
+        // crearte labelling text for the timer or displaying to the game of the current timer
+        this.timerLabel = undefined;
+        // to run the method everysecond 
+        this.countdown = undefined;
+
+
+
 
 
 
     }
 
-    preload() {
-        // load all the asset
+    preload() {// load all the asset
 
 
         imageAsset.forEach(x => {
@@ -183,12 +197,34 @@ export default class MathFigther extends Phaser.Scene {
             fill: "red"
         })
 
+
+
         this.input.on('gameobjectdown', this.addNumber, this);
 
         this.generateQuestion();
 
-    
+        // for the displaying the score
+        this.scoreLabel = this.add.text(10, 15, `The current score: ${this.score}`, {
+            fontSize: '15px',
+            fill: "red"
+        })
 
+
+        // this is for the timer label
+
+        this.timerLabel = this.add.text(this.scoreLabel.x, this.scoreLabel.y + 15, `Timer : ${this.timer}`, {
+            fontSize: '15px',
+            fill: "blue"
+        })
+
+        // countdown the timer
+        // this method for running the another method that we want accoding to the delay or interval
+        this.countdown = this.time.addEvent({
+            delay: 1000,  // set the interval for the selected method 
+            callback: this.gameOver,  // the selected method that you want to run
+            callbackScope: this, // this is for the scope of the method 
+            loop: true // true if you want to loop it for every one second
+        })
     }
 
 
@@ -246,8 +282,13 @@ export default class MathFigther extends Phaser.Scene {
                 this.checkAnswer();
 
                 // we generat the question again
-                 this.generateQuestion();
-                
+                this.generateQuestion();
+
+                // clear the current number to empty array
+                this.numberArray = [];
+                // we set to default number 
+                this.numberArray[0] = 0;
+
 
                 // the script answer validation here
 
@@ -259,7 +300,8 @@ export default class MathFigther extends Phaser.Scene {
             // if the array has only one element which is 0, replace it with a new number
             if (this.numberArray.length == 1 && this.numberArray[0] == 0) {
                 // redeclare or replace the number 0 to the selected one
-                this.numberArray = value;
+                this.numberArray.shift();
+                this.numberArray.push(value);
             }
             // for storting the array and limit the array
             else if (this.numberArray.length < 10) {
@@ -305,12 +347,11 @@ export default class MathFigther extends Phaser.Scene {
                     // then we rearrange the order, to avoid the negative value
                     this.question = `${secondNumber} - ${firstNumber}`;
                     this.answerKey = secondNumber - secondNumber;
-
                 }
                 else {
                     this.question = `${firstNumber} - ${secondNumber}`;
                     this.answerKey = firstNumber - secondNumber;
-
+                    console.log('Answer key:', this.answerKey);
                 }
                 break;
 
@@ -333,16 +374,28 @@ export default class MathFigther extends Phaser.Scene {
     }
 
 
-    checkAnswer(){
-        if(this.answerKey == this.number){
+    checkAnswer() {
+        if (this.answerKey == this.number) {
             alert('You are correct');
+            this.score += 10;
+            this.scoreLabel.setText(`The current score : ${this.score}`)
+            console.log('current score:', this.score);
         }
-        else{
+        else {
             alert('You are incorrect')
         }
     }
 
+    gameOver() {
+        // we decreated the value of the timer
+        this.timer--; // this.timer = this.timer - 1
+        this.timerLabel.setText(`Timer : ${this.timer}`)
+        console.log(`current timer : ${this.timer}`)
+
+        this.timer == 0 ? alert('The time is up!') : 0;
+    }
 
     update() {
+
     }
 } 
