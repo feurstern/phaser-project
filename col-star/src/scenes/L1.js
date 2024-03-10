@@ -2,7 +2,7 @@ import Phaser from "phaser";
 
 const mainChar = 'player'
 
-const imageAsset =[
+const imageAsset = [
     {
         key: 'bomb',
         path: '/images/bomb.png',
@@ -60,7 +60,7 @@ const playerAnim = [
         endFrame: null,
         isStatic: true,
         repeat: null,
-        frame: null
+        frame: 20
     },
     {
         key: 'right',
@@ -99,12 +99,12 @@ const platformGroup = [
     },
 ]
 
-export default class L1 extends Phaser.Scene{
+export default class L1 extends Phaser.Scene {
 
-    constructor(){
-        super (`test`);
+    constructor() {
+        super(`test`);
     }
-    init(){
+    init() {
         //store properties
         this.platform = undefined;
         this.player = undefined;
@@ -112,29 +112,29 @@ export default class L1 extends Phaser.Scene{
         this.cursor = undefined;
     }
 
-    preload(){
+    preload() {
         //load asset
-        imageAsset.forEach((data)=>{
-            if(data.isStaticImage){
+        imageAsset.forEach((data) => {
+            if (data.isStaticImage) {
                 this.load.image(data.key, data.path)
             }
-            else{
-                this.load.spritesheet(data.key, data.path, {frameHeight: 48, frameWidth: 32})
+            else {
+                this.load.spritesheet(data.key, data.path, { frameHeight: 48, frameWidth: 32 })
                 console.log(data)
             }
-        
+
         })
     }
 
-    create(){
+    create() {
         //render asset in browser
-        this.add.image(400,300,'sky');
+        this.add.image(400, 300, 'sky');
         this.platform = this.physics.add.staticGroup();
-        platformGroup.forEach((xyz) =>{
-            if(xyz.isBase){
+        platformGroup.forEach((xyz) => {
+            if (xyz.isBase) {
                 this.platform.create(xyz.x, xyz.y, xyz.key).setScale(2).refreshBody()
             }
-            else{
+            else {
                 this.platform.create(xyz.x, xyz.y, xyz.key);
             }
             this.createPlayer()
@@ -150,28 +150,29 @@ export default class L1 extends Phaser.Scene{
         this.physics.add.collider(this.player, this.platform);
     }
 
-    createPlayerAnim(){
-        for(let i=0;i<playerAnim.length;i++){
+    createPlayerAnim() {
+        for (let i = 0; i < playerAnim.length; i++) {
             // console.log(i)
-            if(playerAnim[i].isStatic){
+            if (playerAnim[i].isStatic) {
                 this.anims.create({
                     key: playerAnim[i].key,
-                    frames: [{key: mainChar, frame: playerAnim[i].startFrame}],
+                    frames: [{ key: mainChar, frame: playerAnim[i].startFrame }],
                     frameRate: playerAnim[i].frame,
-                    repeat: playerAnim[i].repeat
+                    // repeat: playerAnim[i].repeat
                 })
             }
-            else{
+            else {
                 this.anims.create({
                     key: playerAnim[i].key,
-                    frames: this.anims.generateFrameNumbers(mainChar, {start: playerAnim[i].startFrame, end: playerAnim[i].endFrame}),
+                    frames: this.anims.generateFrameNumbers(mainChar, { start: playerAnim[i].startFrame, end: playerAnim[i].endFrame }),
                     frameRate: playerAnim[i].frame,
                     repeat: playerAnim[i].repeat
                 })
             }
         }
     }
-   spawnStar() {
+
+    spawnStar() {
 
         this.star = this.physics.add.group({
             key: 'star',
@@ -184,32 +185,34 @@ export default class L1 extends Phaser.Scene{
             e.setBounceY(0.7);
         })
 
-        this.physics.add.overlap(this.player, this.star, this.collectStar, null, this)
+         this.physics.add.overlap(this.platform, this.star, this.collectStar, null, this)
+
 
     }
-    collectStar(player, star){
+
+    collectStar(player, star) {
         star.destroy();
         console.log('is collide')
     }
 
-    playerMove(){
+    playerMove() {
         let moveLeft = this.cursor.left.isDown
         let moveRight = this.cursor.right.isDown
         let jump = this.cursor.space.isDown
 
-        if(moveLeft){
+        if (moveLeft) {
             this.player.setVelocityX(-200)
             this.player.anims.play('left', true)
         }
-        else if(moveRight){
+        else if (moveRight) {
             this.player.setVelocityX(200)
             this.player.anims.play('right', true)
         }
-        else if(jump){
+        else if (jump) {
             this.player.setVelocityY(-200)
         }
     }
-    update(){
+    update() {
         this.playerMove();
     }
 }
